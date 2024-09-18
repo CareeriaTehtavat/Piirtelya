@@ -7,6 +7,7 @@
 ## TEHTÄVÄNANTO
 - Tee konsolisovellus, jossa piirrät kuusen tähtimerkkejä käyttäen konsolin tulosteeseen. Ohjelmassa on vain konsolitoimintoja, jotka tulostavat kuusen rivi riviltä. 
 - Millä toiminnolla voit tulostaa haluamasi sisällön?
+- Tulostuksen tulee olla sama kuin alla, ja viimeisellä rivillä ei saa olla välilyöntejä!
 
 ```
    * 
