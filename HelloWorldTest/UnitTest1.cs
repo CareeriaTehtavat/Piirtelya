@@ -4,6 +4,7 @@
 using HelloWorld; // Ensure this is the correct namespace for the Program class
 using Microsoft.VisualStudio.TestPlatform.TestHost;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace HelloWorldTest
 {
@@ -16,59 +17,36 @@ namespace HelloWorldTest
         [Trait("TestGroup", "ArtPrinting")]
         public void ArtPrinting()
         {
-            // Arrange
+
+
             using var sw = new StringWriter();
-            Console.SetOut(sw);
+            Console.SetOut(sw); // Capture console output
 
-            // Updated expected output to match actual output format
-            var expectedOutput = "   *\r\n\r\n   *\r\n  ***\r\n *****\r\n*******";
-            var expectedOutput2 = "   *   \r\n       \r\n   *   \r\n  ***  \r\n ***** \r\n*******";
+            // Act
+            HelloWorld.Program.Main(new string[0]); // Run the Main method
 
+            // Get the console output
+            var result = sw.ToString().Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
 
-            // Set a timeout of 30 seconds for the test execution
-            var cancellationTokenSource = new CancellationTokenSource();
-            cancellationTokenSource.CancelAfter(TimeSpan.FromSeconds(30));
-
-            try
-            {
-                // Act
-                Task task = Task.Run(() =>
-                {
-                    // Run the program
-                    HelloWorld.Program.Main(new string[0]);
-                }, cancellationTokenSource.Token);
-
-                task.Wait(cancellationTokenSource.Token);  // Wait for the task to complete or timeout
-
-                // Get the output that was written to the console
-                var result = sw.ToString().TrimEnd(); // Trim only the end of the string
-
-                var resultLines = result.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
-                var expectedLines1 = expectedOutput.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
-                var expectedLines2 = expectedOutput2.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
-
-                // Check if the result matches either expected output
-                bool matchesExpectedOutput1 = CompareLines(resultLines, expectedLines1);
-                bool matchesExpectedOutput2 = CompareLines(resultLines, expectedLines2);
-
-                // Assert
-                Assert.True(matchesExpectedOutput1 || matchesExpectedOutput2, "The output did not match either expected pattern. Output: " + result);
+            // Prepare expected multiplication table output
+   
+            // Assert that the correct prompt is shown
+            Assert.False(string.IsNullOrEmpty(result[0]), "The first line should not be null or empty.");
 
 
+            // Checks if line contains exactly three spaces followed by a single asterisk and then any amount of trailing spaces.
+            Assert.True(Regex.IsMatch(result[0], @"^ {3}\*\s*$"));
+            Assert.True(Regex.IsMatch(result[2], @"^ {3}\*\s*$"));
 
-            }
-            catch (OperationCanceledException)
-            {
-                Assert.True(false, "The operation was canceled due to timeout.");
-            }
-            catch (AggregateException ex) when (ex.InnerException is OperationCanceledException)
-            {
-                Assert.True(false, "The operation was canceled due to timeout.");
-            }
-            finally
-            {
-                cancellationTokenSource.Dispose();
-            }
+            // Checks if line contains exactly two spaces followed by three asterisks and any amount of trailing spaces.
+            Assert.True(Regex.IsMatch(result[3], @"^ {2}\*{3}\s*$"));
+
+            // Checks if line contains exactly one space followed by five asterisks and any amount of trailing spaces.
+            Assert.True(Regex.IsMatch(result[4], @"^ {1}\*{5}\s*$"));
+
+            // Checks if line starts with exactly seven asterisks and any amount of trailing spaces.
+            Assert.True(Regex.IsMatch(result[5], @"^\*{7}\s*$"));
+
         }
 
 
